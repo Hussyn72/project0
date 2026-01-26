@@ -6,22 +6,22 @@ const PORT = 3000;
 
 app.get('/',(req,res)=>{
     console.log("Received a GET Request");
-    res.end("GOt the GET");
+    res.send({FirstName : "Mohd Husain", LastName : "Darji", Age : 24, MobileNo : 7208309120});
 })
 
-app.post('/',(res,req)=>{
+app.post('/',(req,res)=>{
     console.log("Received a POST Request");
-    res.end("GOT the POST");
+    res.send("GOT the POST");
 })
 
-app.patch('/', (req, res) => {
+app.patch('/',(req, res) => {
     console.log("Received the PATCH Reqest");
-    res.end("GOT the PATCH");
+    res.send("GOT the PATCH");
 });
 
-app.delete('/',(res,req)=>{
+app.delete('/',(req,res)=>{
     console.log("Received a DELETE Request");
-    res.end("GOT THE DELETE");
+    res.send("GOT THE DELETE");
 })
 
 app.listen(PORT,()=>{
