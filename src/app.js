@@ -4,109 +4,66 @@ const { homedir } = require("os");
 const { adminAuth } = require("./AuthController/adminAuth");
 const { userAuth } = require("./AuthController/userAuth");
 const { error } = require("console");
+const connectDB = require("./config.js/database");
+const userModel = require("./models/userModel");
 
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // for form data
+//app.use(express.urlencoded({ extended: true })); // for form data
 
+//SignUp API
+app.post("/signup", async (req, res) => {
+  //creating a new instance of the USer Model
+  console.log(req.body);
+  const user = new userModel(req.body);
 
-
-//Handle Auth Middleware for only Admin GET, POST,.... Request.
-app.use("/admin", adminAuth);
-app.use("/user", userAuth);
-
-//GET ALL DATA
-app.get("/admin/getAllData", (req, res) => {
-  res.send("GET ALL DATA");
-});
-
-//DELETE ALL DATA
-app.delete("/admin/deleteUser", (req, res) => {
-  res.send("Data Deleted");
-});
-
-app.use("/", (err, req, res, next) => {
-  if (err) {
-    res.status(500).send("Error Got Caught");
+  //user is a instance of usermodel object.
+  //data will be save to database and will return you a promise, because it may take time to insert its a async task and we'll make it async and handle that way only.
+  //always handle db thing to try catch block and anything in try catch block to handle the errors gracefully.
+  try {
+    await user.save();
+    res.send("User Added Successfully...");
+  } catch (err) {
+    res
+      .status(400)
+      .send("ERror Occured while Inserting the data into db" + err.message);
   }
 });
 
-//SIGN-UP /LOGIN
-app.post("/user/login", ( req, res) => {
-  //try{
-    throw new error("xyz");
-  // }catch(e){
-  //   res.status(550).send("pakda mai error")
-  // }
-  res.send("User Logged In Successfully.");
-});
-
-//WAY of error Handling it will go in the last its called wild card error handling - always use 
-//try catch.
-app.use("/", (err, req, res, next) => {
-  if (err) {
-    res.status(500).send("Error Got Caught - Phirse");
+//get one user first by email
+app.get("/user", async (req, res) => {
+  const Email = req.body.EmailId;
+  console.log(Email);
+  try {
+    const user = await userModel.findOne({ EmailId: Email });
+    console.log(user);
+    res.status(200).send(user);
+  } catch (err) {
+    res.status(404).status("User Not Found");
   }
 });
 
-//STUDY
-app.get("/user/:id/orderid/:orderid", userAuth, (req, res) => {
-  console.log("Received a GET Request");
-  res.status(201).send({
-    params: req.params,
-    query: req.query,
-    data: {
-      OrderId: req.params.orderid,
-      paramsID: req.params.id,
-      FirstName: "Mohd Husain",
-      LastName: "Darji",
-      Age: 24,
-      MobileNo: 7208309120,
-      id: req.query.id,
-      url: req.url,
-      fullurl: `${req.protocol}://${req.get("host")}${req.originalUrl}`,
-      onlypath: `${req.originalUrl}`,
-      reqBody: `${JSON.stringify(req.body)}`,
-      reqCookie: `${req.cookies}`,
-      reqMethod: `${req.method}`,
-      reqHost: `${req.host}`,
-      reqHostname: `${req.hostname}`,
-      reqIP: `${req.ip}`,
-    },
-    flag: "Received a GET Request",
+//feed API get all the users of db
+app.get("/feed", async (req, res) => {
+  //get the data from database.
+  try {
+    const allUser = await userModel.find({});
+    console.log(allUser);
+    res.send(allUser);
+  } catch (err) {
+    res.status(404).send("No User Found");
+  }
+});
+
+connectDB()
+  .then(() => {
+    console.log("Database Connection Established Successfully...");
+    app.listen(PORT, () => {
+      console.log(`Server is Listening on port ${PORT} Suceessfully ....`);
+    });
+  })
+  .catch(() => {
+    console.log("Database Connection Failed !");
   });
-});
-
-app.post("/", (req, res) => {
-  console.log("Received a POST Request");
-  res.send(req.params);
-  res.send(req.query);
-  res.send("GOT the POST");
-});
-
-app.post("/user/:id/orderid/:orderid", (req, res) => {
-  console.log("Received a POST Request");
-  // res.send(req.params);
-  res.send({ body: req.body, test: "dekhte hai aata hai ki nahi" });
-  //   res.send("GOT the POST");
-});
-
-app.patch("/", (req, res) => {
-  console.log("Received the PATCH Reqest");
-  res.send(req.params);
-  res.send(req.query);
-  res.send("GOT the PATCH");
-});
-
-app.delete("/", (req, res) => {
-  console.log("Received a DELETE Request");
-  res.send(req.params);
-  res.send(req.query);
-  res.send("GOT THE DELETE");
-});
-
-app.listen(PORT, () => {
-  console.log(`Server is Listening on port ${PORT} Suceessfully ....`);
-});
