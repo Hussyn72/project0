@@ -1,6 +1,9 @@
 const express = require("express");
 const fs = require("fs");
 const { homedir } = require("os");
+const { adminAuth } = require("./AuthController/adminAuth");
+const { userAuth } = require("./AuthController/userAuth");
+const { error } = require("console");
 
 const app = express();
 const PORT = 3000;
@@ -8,7 +11,48 @@ const PORT = 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // for form data
 
-app.get("/user/:id/orderid/:orderid", (req, res) => {
+
+
+//Handle Auth Middleware for only Admin GET, POST,.... Request.
+app.use("/admin", adminAuth);
+app.use("/user", userAuth);
+
+//GET ALL DATA
+app.get("/admin/getAllData", (req, res) => {
+  res.send("GET ALL DATA");
+});
+
+//DELETE ALL DATA
+app.delete("/admin/deleteUser", (req, res) => {
+  res.send("Data Deleted");
+});
+
+app.use("/", (err, req, res, next) => {
+  if (err) {
+    res.status(500).send("Error Got Caught");
+  }
+});
+
+//SIGN-UP /LOGIN
+app.post("/user/login", ( req, res) => {
+  //try{
+    throw new error("xyz");
+  // }catch(e){
+  //   res.status(550).send("pakda mai error")
+  // }
+  res.send("User Logged In Successfully.");
+});
+
+//WAY of error Handling it will go in the last its called wild card error handling - always use 
+//try catch.
+app.use("/", (err, req, res, next) => {
+  if (err) {
+    res.status(500).send("Error Got Caught - Phirse");
+  }
+});
+
+//STUDY
+app.get("/user/:id/orderid/:orderid", userAuth, (req, res) => {
   console.log("Received a GET Request");
   res.status(201).send({
     params: req.params,
