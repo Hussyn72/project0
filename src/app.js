@@ -11,7 +11,7 @@ const app = express();
 const PORT = 3000;
 
 app.use(express.json());
-//app.use(express.urlencoded({ extended: true })); // for form data
+app.use(express.urlencoded({ extended: true })); // for form data
 
 //SignUp API
 app.post("/signup", async (req, res) => {
@@ -54,6 +54,36 @@ app.get("/feed", async (req, res) => {
     res.send(allUser);
   } catch (err) {
     res.status(404).send("No User Found");
+  }
+});
+
+//UPDATE API
+app.patch("/userupdate", async (req, res) => {
+  const userId = req.body.userId;
+  const data = req.body;
+
+  console.log(data);
+  try {
+    const updateUserModel = await userModel.findByIdAndUpdate({_id:userId},data,{
+      returnDocument: 'after'
+    });
+    console.log(updateUserModel);
+    res.send("Updated User Successfully.");
+  } catch (err) {
+    res.status(404).send("User Not Found -> " + err.message);
+  }
+});
+
+//DELETE API
+app.delete("/user", async (req, res) => {
+  const userId = req.body.userId;
+  try {
+    console.log("Got the user ID from request -> ",userId)
+    const deleteUser = await userModel.findByIdAndDelete({_id:userId});
+    res.status(201).send("User Deleted Successfully ");
+  } catch (err) {
+    console.log(err);
+    res.status(404).send("User Does Not Found");
   }
 });
 
