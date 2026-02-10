@@ -6,7 +6,7 @@ const { userAuth } = require("./AuthController/userAuth");
 const { error } = require("console");
 const connectDB = require("./config.js/database");
 const userModel = require("./models/userModel");
-const {validateSignUpData} = require("./utils/validation");
+const { validateSignUpData } = require("./utils/validation");
 const bcrypt = require("bcrypt");
 
 const app = express();
@@ -14,7 +14,6 @@ const PORT = 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // for form data
-
 
 //SignUp API
 app.post("/signup", async (req, res) => {
@@ -25,16 +24,15 @@ app.post("/signup", async (req, res) => {
     validateSignUpData(req);
 
     //encrypt the password
-    const hashedPassword = await bcrypt.hash(Password,10);
-    console.log("Hashed Password ->"+hashedPassword);
+    const hashedPassword = await bcrypt.hash(Password, 10);
+    console.log("Hashed Password ->" + hashedPassword);
 
-     
     //creating new instances of use model
     const user = new userModel({
       FirstName,
       LastName,
       EmailId,
-      Password : hashedPassword,
+      Password: hashedPassword,
       Age,
       Gender,
     });
@@ -43,50 +41,27 @@ app.post("/signup", async (req, res) => {
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
+});
 
-
-
-
-  app.patch("/user/:id", async (req, res) => {
-    try {
-      const allowedUpdates = ["FirstName", "LastName", "age", "gender", "photoURL"];
-      const updates = Object.keys(req.body);
-
-      const isValid = updates.every((field) => allowedUpdates.includes(field));
-
-      if (!isValid) {
-        return res.status(400).json({ error: "Invalid update fields" });
+//Login API
+app.post("/login", async (req, res) => {
+  try {
+    const { EmailId, Password } = req.body;
+    const userExists =  await userModel.findOne({ EmailId: EmailId });
+    if (!userExists) {
+      console.log("User Email is not present in the Database");
+      res.status(404).send("User Not Found");
+    } else {
+      const isPasswordCorrect = await bcrypt.compare(Password, userExists.Password);
+      if(isPasswordCorrect){
+        res.status(200).send("Logged In Successfully");
+      }else{
+        res.status(400).send("Password is not Correct");
       }
-
-      // Data sanitization
-      if (req.body.name) req.body.name = req.body.name.trim();
-
-      const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-        runValidators: true,
-      });
-
-      res.json(user);
-    } catch (err) {
-      res.status(400).json({ error: err.message });
     }
-  });
-
-  //creating a new instance of the USer Model
-  /*console.log(req.body);
-  const user = new userModel(req.body);*/
-
-  //user is a instance of usermodel object.
-  //data will be save to database and will return you a promise, because it may take time to insert its a async task and we'll make it async and handle that way only.
-  //always handle db thing to try catch block and anything in try catch block to handle the errors gracefully.
-  /*try {
-    await user.save();
-    res.send("User Added Successfully...");
-  } catch (err) {
-    res
-      .status(400)
-      .send("ERror Occured while Inserting the data into db" + err.message);
-  }*/
+  } catch (error) {
+    res.status(400).send("Login Failed !" + error.message);
+  }
 });
 
 //get one user first by email
@@ -145,6 +120,38 @@ app.delete("/user", async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(404).send("User Does Not Found");
+  }
+});
+
+//needs attention here will do it later.
+app.patch("/user/:id", async (req, res) => {
+  try {
+    const allowedUpdates = [
+      "FirstName",
+      "LastName",
+      "age",
+      "gender",
+      "photoURL",
+    ];
+    const updates = Object.keys(req.body);
+
+    const isValid = updates.every((field) => allowedUpdates.includes(field));
+
+    if (!isValid) {
+      return res.status(400).json({ error: "Invalid update fields" });
+    }
+
+    // Data sanitization
+    if (req.body.name) req.body.name = req.body.name.trim();
+
+    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    res.json(user);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
   }
 });
 
