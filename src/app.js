@@ -20,12 +20,16 @@ app.post("/signup", async (req, res) => {
   try {
     const { FirstName, LastName, Age, Password, Gender, EmailId } = req.body;
 
+    const userExist = await userModel.findOne({EmailId : EmailId});
+    if(userExist){
+      return res.status(409).send("User Already Exists");
+    }
+
     //validation of data
     validateSignUpData(req);
 
     //encrypt the password
     const hashedPassword = await bcrypt.hash(Password, 10);
-    console.log("Hashed Password ->" + hashedPassword);
 
     //creating new instances of use model
     const user = new userModel({
@@ -39,6 +43,9 @@ app.post("/signup", async (req, res) => {
     await user.save();
     res.status(200).json({ message: "User Created Successfully", user });
   } catch (error) {
+    if(error.code === 11000){
+      return res.status(409).json({message:"user already exists"});
+    }
     res.status(400).json({ error: error.message });
   }
 });
