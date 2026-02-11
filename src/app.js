@@ -69,11 +69,11 @@ app.post("/login", async (req, res) => {
         //Create JWT Token
         const token = await jwt.sign(
           { _id: userExists._id },
-          "SadluTuhai@chaiwala"
+          "SadluTuhai@chaiwala",{expiresIn:'7d'}
         );
 
         //Add the token to cookie and send the response back to user
-        res.cookie("JWTToken", token);
+        res.cookie("JWTToken", token, {expires : new Date(Date.now()+7*24*60*60*1000)});//7 days
         res.status(200).send("Logged In Successfully");
       } else {
         res.status(400).send("Password is not Correct");
@@ -91,6 +91,15 @@ app.get("/profile", userAuth, async (req, res) => {
     res.status(200).send(user);
   } catch (error) {
     res.status(401).send(error.message);
+  }
+});
+
+//sendConnectionrequest API
+app.post("/sendConnectionRequest", userAuth, async (req,res)=>{
+  try{
+    res.status(200).send(`${req.user.FirstName} You have sent the COnnection request Successfully`);
+  }catch(error){
+    res.status(400).send("Bad Request");
   }
 });
 
