@@ -1,8 +1,7 @@
 const express = require("express");
 const fs = require("fs");
 const { homedir } = require("os");
-const { adminAuth } = require("./AuthController/adminAuth");
-const { userAuth } = require("./AuthController/userAuth");
+const { userAuth } = require("./AuthController/Auth");
 const { error } = require("console");
 const connectDB = require("./config.js/database");
 const userModel = require("./models/userModel");
@@ -72,10 +71,9 @@ app.post("/login", async (req, res) => {
           { _id: userExists._id },
           "SadluTuhai@chaiwala"
         );
-        console.log(token);
 
         //Add the token to cookie and send the response back to user
-        res.cookie("JWTtoken", token);
+        res.cookie("JWTToken", token);
         res.status(200).send("Logged In Successfully");
       } else {
         res.status(400).send("Password is not Correct");
@@ -87,17 +85,10 @@ app.post("/login", async (req, res) => {
 });
 
 //Profile API
-app.get("/profile", async (req, res) => {
+app.get("/profile", userAuth, async (req, res) => {
   try {
-    const cookies = req.cookies;
-    const { JWTtoken } = cookies;
-    if (!JWTtoken) {
-      throw new Error("UnAuthorized Request");
-    }
-    const isTokenValid = await jwt.verify(JWTtoken, "SadluTuhai@chaiwala");
-    const { _id } = isTokenValid;
-    const gotUser = await userModel.findOne({ _id: _id });
-    res.status(200).send(gotUser);
+    const user = req.user;
+    res.status(200).send(user);
   } catch (error) {
     res.status(401).send(error.message);
   }
