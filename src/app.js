@@ -61,26 +61,22 @@ app.post("/login", async (req, res) => {
       console.log("User Email is not present in the Database");
       res.status(404).send("User Not Found");
     } else {
-      const isPasswordCorrect = await bcrypt.compare(
-        Password,
-        userExists.Password
-      );
+      const isPasswordCorrect = await userExists.validatePassword(Password);
       if (isPasswordCorrect) {
         //Create JWT Token
-        const token = await jwt.sign(
-          { _id: userExists._id },
-          "SadluTuhai@chaiwala",{expiresIn:'7d'}
-        );
+        const token = await userExists.getJWT();
 
         //Add the token to cookie and send the response back to user
-        res.cookie("JWTToken", token, {expires : new Date(Date.now()+7*24*60*60*1000)});//7 days
+        res.cookie("JWTToken", token, {
+          expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        }); //7 days
         res.status(200).send("Logged In Successfully");
       } else {
         res.status(400).send("Password is not Correct");
       }
     }
   } catch (error) {
-    res.status(400).send("Login Failed !" + error.message);
+    res.status(400).send("Login Failed ! " + error.message);
   }
 });
 
@@ -95,10 +91,14 @@ app.get("/profile", userAuth, async (req, res) => {
 });
 
 //sendConnectionrequest API
-app.post("/sendConnectionRequest", userAuth, async (req,res)=>{
-  try{
-    res.status(200).send(`${req.user.FirstName} You have sent the COnnection request Successfully`);
-  }catch(error){
+app.post("/sendConnectionRequest", userAuth, async (req, res) => {
+  try {
+    res
+      .status(200)
+      .send(
+        `${req.user.FirstName} You have sent the COnnection request Successfully`
+      );
+  } catch (error) {
     res.status(400).send("Bad Request");
   }
 });
