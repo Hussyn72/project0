@@ -96,7 +96,7 @@ app.post("/sendConnectionRequest", userAuth, async (req, res) => {
     res
       .status(200)
       .send(
-        `${req.user.FirstName} You have sent the COnnection request Successfully`
+        `${req.user.FirstName} You have sent the COnnection request Successfully`,
       );
   } catch (error) {
     res.status(400).send("Bad Request");
@@ -140,7 +140,7 @@ app.patch("/userupdate", async (req, res) => {
       data,
       {
         returnDocument: "after",
-      }
+      },
     );
     console.log(updateUserModel);
     res.send("Updated User Successfully.");
@@ -192,6 +192,16 @@ app.patch("/user/:id", async (req, res) => {
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
+});
+
+app.post("/logout", (req, res) => {
+  //add a check here if the user is authenticated or not and then clear the cookie
+  if (!req.cookies.JWTToken) {
+    return res.status(401).send("Unauthorized");
+  }
+
+  res.clearCookie("JWTToken");
+  res.status(200).send("Logged Out Successfully");
 });
 
 connectDB()
