@@ -2,7 +2,6 @@ const express = require("express");
 const { homedir } = require("os");
 const { error } = require("console");
 const connectDB = require("./config.js/database");
-const userModel = require("./models/userModel");
 const authRouter = require("./routes/authRouter");
 const profileRouter = require("./routes/profileRouter");
 const requestRouter = require("./routes/requestRouter");
