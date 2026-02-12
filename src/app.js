@@ -197,7 +197,7 @@ app.patch("/user/:id", async (req, res) => {
 app.post("/logout", (req, res) => {
   //add a check here if the user is authenticated or not and then clear the cookie
   if (!req.cookies.JWTToken) {
-    return res.status(401).send("Unauthorized");
+    return res.status(401).send("Login First to Logout");
   }
 
   res.clearCookie("JWTToken");
