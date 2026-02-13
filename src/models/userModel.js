@@ -59,16 +59,25 @@ const userSchema = new mongoose.Schema(
     },
     photoURL: {
       type: String,
+      default:
+        "https://png.pngtree.com/png-vector/20231019/ourmid/pngtree-user-profile-avatar-png-image_10211467.png",
       validate(value) {
         if (!validator.isURL(value)) {
           throw new Error("Invalid photo URL");
         }
       },
     },
+    about: {
+      type: String,
+      maxlength: [200, "Maximum length for about is 200 characters"],
+    },
+    skills: {
+      type: [String],
+    },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 userSchema.methods.getJWT = async function () {
@@ -85,7 +94,7 @@ userSchema.methods.validatePassword = async function (PasswordEnteredByUser) {
 
   const isPasswordCorrect = bcrypt.compare(
     PasswordEnteredByUser,
-    hashedPassword
+    hashedPassword,
   );
   return isPasswordCorrect;
 };

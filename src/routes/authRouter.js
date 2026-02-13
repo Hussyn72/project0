@@ -1,5 +1,4 @@
 const express = require("express");
-const { userAuth } = require("../AuthController/Auth");
 const userModel = require("../models/userModel");
 const { validateSignUpData } = require("../utils/validation");
 const bcrypt = require("bcrypt");
@@ -32,6 +31,9 @@ authRouter.post("/signup", async (req, res) => {
       Password: hashedPassword,
       Age,
       Gender,
+      about,
+      skills,
+      photoURL,
     });
     await user.save();
     res.status(200).json({ message: "User Created Successfully", user });
@@ -74,11 +76,12 @@ authRouter.post("/login", async (req, res) => {
 //logout API
 authRouter.post("/logout", (req, res) => {
   //add a check here if the user is authenticated or not and then clear the cookie
-  if (!req.cookies.JWTToken) {
-    return res.status(401).send("Login First to Logout");
-  }
+  // if (!req.cookies.JWTToken) {
+  //   return res.status(401).send("Login First to Logout");
+  // }
+  res.cookie("JWTToken", null, { expires: new Date(Date.now()) });
 
-  res.clearCookie("JWTToken");
+  //res.clearCookie("JWTToken");
   res.status(200).send("Logged Out Successfully");
 });
 
