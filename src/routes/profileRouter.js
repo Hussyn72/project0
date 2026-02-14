@@ -53,7 +53,7 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
 });
 
 //Change Password API
-profileRouter.patch("/profile/password", userAuth, async (req, res) => {
+profileRouter.patch("/profile/change-password", userAuth, async (req, res) => {
   try {
     const loggedInUser = req.user;
     const currentHashedPassword = loggedInUser.Password;
