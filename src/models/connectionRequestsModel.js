@@ -24,6 +24,9 @@ const connectionRequestsSchema = new mongoose.Schema(
   },
 );
 
+//creating a compound index 1 means ascending -1 means descending.compound index means collabing muliple columns
+connectionRequestsSchema.index({ fromUserId: 1, toUserId: 1 });
+
 //before saving this function will be call.
 connectionRequestsSchema.mongoose.pre("save", function () {
   const connectionRequest = this;
