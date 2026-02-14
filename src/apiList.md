@@ -12,7 +12,8 @@ POST /logout done
 
 GET /profile/view done
 PATCH /profile/edit done
-PATCH /profile/password //forgot password api
+PATCH /profile/password //forgot password api done
+POST /profile/forgot-password
 
 ## UserRouter
 

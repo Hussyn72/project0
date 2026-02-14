@@ -74,6 +74,15 @@ const userSchema = new mongoose.Schema(
     skills: {
       type: [String],
     },
+    resetOTP: {
+      type: String,
+    },
+    otpExpiry: {
+      type: Date,
+    },
+    isOTPverified: {
+      type: Boolean,
+    },
   },
   {
     timestamps: true,
