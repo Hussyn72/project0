@@ -8,6 +8,8 @@ const userSchema = new mongoose.Schema(
     FirstName: {
       type: String,
       required: true,
+      unique: true,
+      index: true,
       // "First Name is Required Please Enter First Name"],
       trim: true,
       minlength: [4, "minimum length for First Name is 3"],
