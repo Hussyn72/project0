@@ -12,6 +12,11 @@ userRouter.get("/feed", userAuth, async (req, res) => {
   try {
     const loggedInUser = req.user;
 
+    const page = parseInt(req.query.page) || 1;
+    let limit = parseInt(req.query.limit) || 10;
+    limit = limit > 50 ? 50 : limit;
+    const skip = (page - 1) * limit;
+
     //all user accept logged in user.
     //user once ignore should not come again.
     //already connected users should not come again.
@@ -30,7 +35,9 @@ userRouter.get("/feed", userAuth, async (req, res) => {
           { _id: { $ne: loggedInUser._id } },
         ],
       })
-      .select(USER_SAFE_DATA);
+      .select(USER_SAFE_DATA)
+      .skip(skip)
+      .limit(limit);
 
     res.status(200).json({ message: "All Users Fetched Successfully", users });
   } catch (error) {
