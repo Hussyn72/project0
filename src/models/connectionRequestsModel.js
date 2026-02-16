@@ -4,10 +4,12 @@ const connectionRequestsSchema = new mongoose.Schema(
   {
     fromUserId: {
       type: mongoose.Schema.Types.ObjectId, //getting the ID of document.
+      ref: "User", //creating the reference linking the 2 collections.
       required: true,
     },
     toUserId: {
       type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
     status: {
@@ -28,13 +30,15 @@ const connectionRequestsSchema = new mongoose.Schema(
 connectionRequestsSchema.index({ fromUserId: 1, toUserId: 1 });
 
 //before saving this function will be call.
-connectionRequestsSchema.mongoose.pre("save", function () {
+connectionRequestsSchema.pre("save", function () {
   const connectionRequest = this;
   //Check if the fromUserId is same as toUserId
-  if (connectionRequest.fromUserId.equals(connectionRequest.toUserId)) {
+  if (this.fromUserId.equals(this.toUserId)) {
     throw new Error("You cannot send connection request to yourself");
   }
-  next();
 });
 
-module.exports = mongoose.model("ConnectionRequests", connectionRequestsSchema);
+module.exports = new mongoose.model(
+  "ConnectionRequests",
+  connectionRequestsSchema,
+);

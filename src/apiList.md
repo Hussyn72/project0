@@ -13,17 +13,25 @@ POST /logout done
 GET /profile/view done
 PATCH /profile/edit done
 PATCH /profile/password //forgot password api done
-POST /profile/forgot-password
+POST /profile/forgot-password done
 
 ## UserRouter
 
-GET /user/feed - Gets you all the available profile
-GET /user/connections
-GET /user/Requests
+GET /user/feed - Gets you all the available profile.
+GET /user/connections //getting all the connections.
+GET /user/Requests //getting all the requests.
 
 ## connectionRequestRouters
 
-GET /request/send/interact/:userId
-POST /request/send/ignored/:userId
-POST /request/review/accepted/:connectioRequestId
-POST /request/review/rejected/:connectionRequestId
+GET /request/send/intrested/:userId done
+POST /request/send/ignored/:userId done
+created combo of both using dynamic route
+
+POST /request/send/:status/:userId done.
+
+POST /request/review/accepted/:requestId
+POST /request/review/rejected/:requestId
+
+doing same with this
+
+POST /request/review/:status/:requestId done.

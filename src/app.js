@@ -5,6 +5,7 @@ const connectDB = require("./config.js/database");
 const authRouter = require("./routes/authRouter");
 const profileRouter = require("./routes/profileRouter");
 const requestRouter = require("./routes/requestRouter");
+const userRouter = require("./routes/userRouter");
 
 const app = express();
 const PORT = 3000;
@@ -15,6 +16,7 @@ app.use(express.urlencoded({ extended: true })); // for form data
 app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
+app.use("/", userRouter);
 
 connectDB()
   .then(() => {

@@ -60,7 +60,7 @@ requestRouter.post(
       const data = await connectionRequest.save();
 
       res.status(200).json({
-        message: `${req.user.FirstName} You have sent the COnnection request Successfully`,
+        message: `${req.user.FirstName} You are ${status}  in ${isToUserExist.FirstName}`,
         data,
       });
     } catch (error) {
@@ -69,4 +69,41 @@ requestRouter.post(
   },
 );
 
+//request Review
+requestRouter.post(
+  "/request/review/:status/:requesId",
+  userAuth,
+  async (req, res) => {
+    try {
+      const loggedinUser = req.user;
+      const requesId = req.params.requesId;
+      const status = req.params.status;
+
+      //pass the allowed status from this api
+      const allowedStatus = ["accepted", "rejected"];
+      if (!allowedStatus.includes(status)) {
+        return res
+          .status(400)
+          .json({ message: "Status is not supported " + status });
+      }
+
+      //only the touserId LoggedIn user should Accept or reject.
+      //status should be intrested only for review.
+      //requestID should be valid.
+      const connectionRequestVerify = await ConnectionRequest.findById({
+        _id: requesId,
+        toUserId: loggedinUser._id,
+        status: "intrested",
+      });
+
+      connectionRequestVerify.status = status;
+      const data = await connectionRequestVerify.save();
+      res
+        .status(200)
+        .json({ message: "Connection updated Successfully", data });
+    } catch (error) {
+      res.status(400).json({ Error: error.message });
+    }
+  },
+);
 module.exports = requestRouter;
