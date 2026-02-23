@@ -3,9 +3,20 @@ const userModel = require("../models/userModel");
 const { validateSignUpData } = require("../utils/validation");
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
+const rateLimit = require("express-rate-limit");
 
 const authRouter = express.Router();
 authRouter.use(cookieParser());
+
+//Added rate Limit
+const loginLimit = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minutes
+  max: 5, // Limit each IP to 5 login requests per `window` (here, per minute)
+  message:
+    "Too many login attempts from this IP, please try again after a minute",
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
 
 //SignUp API
 authRouter.post("/signup", async (req, res) => {
@@ -46,7 +57,7 @@ authRouter.post("/signup", async (req, res) => {
 });
 
 //Login API
-authRouter.post("/login", async (req, res) => {
+authRouter.post("/login", loginLimit, async (req, res) => {
   try {
     const { EmailId, Password } = req.body;
     const userExists = await userModel.findOne({ EmailId: EmailId });
